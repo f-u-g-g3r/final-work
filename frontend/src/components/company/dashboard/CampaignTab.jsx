@@ -3,7 +3,7 @@ import {
   getInitiatedCampaigns,
   createCampaign,
   updateCampaign,
-  disableCampaign,
+  deleteCampaign,
 } from "../../../services/campaign-service";
 
 export default function CampaignTab({
@@ -25,21 +25,45 @@ export default function CampaignTab({
   const [selectedPartnerships, setSelectedPartnerships] = useState([]);
   const [partnerSearch, setPartnerSearch] = useState("");
   const [showPartnerDropdown, setShowPartnerDropdown] = useState(false);
+  const [editingCampaign, setEditingCampaign] = useState(null);
 
   useEffect(() => {
-    getInitiatedCampaigns(localStorage.getItem("companyId")).then((res) => {
+    getInitiatedCampaigns(localStorage.getItem("companyId"), {
+      pagingOptions: {
+        page: pages.campaigns,
+        pageSize: pageSize,
+      },
+      sortOptions: {
+        sortBy: "id",
+        direction: 0,
+      },
+    }).then((res) => {
       setCampaigns(res.content || []);
     });
   }, [pages.campaigns]);
 
   const handleCreate = () => {
-    if (!newCampaign.title || !newCampaign.discountPercentage) return;
+    if (
+      !newCampaign.title ||
+      !newCampaign.discountPercentage ||
+      newCampaign.partnershipsIds.length == 0
+    )
+      return;
+    if (newCampaign.validUntil) {
+      const dateObj = new Date(newCampaign.validUntil);
+      if (isNaN(dateObj.getTime())) {
+        alert("Please enter a valid date");
+        return;
+      }
+      newCampaign.validUntil = dateObj.toISOString().split(".")[0] + ".000000";
+      console.log(newCampaign.validUntil);
+    }
+
     createCampaign({
       ...newCampaign,
       initiatorId: localStorage.getItem("companyId"),
       partnershipsIds: selectedPartnerships.map((p) => p.id),
     }).then(() => {
-      setShowForm(false);
       setNewCampaign({
         title: "",
         description: "",
@@ -47,9 +71,9 @@ export default function CampaignTab({
         validUntil: "",
         partnershipsIds: [],
       });
-      refreshAll();
       getInitiatedCampaigns(localStorage.getItem("companyId")).then((res) => {
         setCampaigns(res.content || []);
+        refreshAll();
       });
     });
   };
@@ -63,6 +87,44 @@ export default function CampaignTab({
 
   const handleRemovePartner = (id) => {
     setSelectedPartnerships((prev) => prev.filter((p) => p.id !== id));
+  };
+
+  const handleDelete = (id) => {
+    deleteCampaign(id).then(() => {
+      setCampaigns((prev) => prev.filter((c) => c.id !== id));
+      refreshAll();
+    });
+  };
+
+  const handleEditClick = (campaign) => {
+    setEditingCampaign({
+      id: campaign.id,
+      title: campaign.title,
+      description: campaign.description,
+      discountPercentage: campaign.discountPercentage,
+      validUntil: campaign.validUntil?.split("T")[0] || "",
+    });
+
+    document.getElementById("editCampaignModal").showModal();
+  };
+
+  const handleUpdate = (e) => {
+    e.preventDefault();
+    const updated = {
+      ...editingCampaign,
+      validUntil: editingCampaign.validUntil
+        ? new Date(editingCampaign.validUntil).toISOString().split(".")[0] +
+          ".000000"
+        : null,
+    };
+    updateCampaign(updated.id, updated).then(() => {
+    document.getElementById("editCampaignModal").close();
+      setEditingCampaign(null);
+      getInitiatedCampaigns(localStorage.getItem("companyId")).then((res) => {
+        setCampaigns(res.content || []);
+        refreshAll();
+      });
+    });
   };
 
   return (
@@ -252,6 +314,77 @@ export default function CampaignTab({
             </div>
           </div>
         </dialog>
+
+        <dialog id="editCampaignModal" className="modal">
+          <div className="modal-box w-11/12 max-w-3xl">
+            <h3 className="font-bold text-lg">Edit Campaign</h3>
+
+            {editingCampaign && (
+              <div className="mt-4 space-y-4 p-4 bg-base-100">
+                <input
+                  type="text"
+                  className="input input-bordered w-full"
+                  placeholder="Title"
+                  value={editingCampaign.title}
+                  onChange={(e) =>
+                    setEditingCampaign({
+                      ...editingCampaign,
+                      title: e.target.value,
+                    })
+                  }/>
+                <textarea
+                  className="input textarea textarea-bordered w-full"
+                  placeholder="Description"
+                  value={editingCampaign.description}
+                  onChange={(e) =>
+                    setEditingCampaign({
+                      ...editingCampaign,
+                      description: e.target.value,
+                    })
+                  }
+                />
+                <label className="input">
+                  <input
+                    type="number"
+                    className="grow"
+                    placeholder="Discount %"
+                    value={editingCampaign.discountPercentage}
+                    onChange={(e) =>
+                      setEditingCampaign({
+                        ...editingCampaign,
+                        discountPercentage: parseFloat(e.target.value),
+                      })
+                    }
+                  />
+                  %
+                </label>
+                <input
+                  type="date"
+                  className="input input-bordered w-full"
+                  value={editingCampaign.validUntil}
+                  onChange={(e) =>
+                    setEditingCampaign({
+                      ...editingCampaign,
+                      validUntil: e.target.value,
+                    })
+                  }
+                />
+
+                <div className="modal-action">
+                  <form method="dialog">
+                    <button className="btn mx-5">Cancel</button>
+                    <button
+                      className="btn btn-success"
+                      onClick={(e) => handleUpdate(e)}
+                    >
+                      Save Changes
+                    </button>
+                  </form>
+                </div>
+              </div>
+            )}
+          </div>
+        </dialog>
       </div>
       <div>
         <h3 className="text-xl font-semibold mb-2">Campaigns</h3>
@@ -267,20 +400,33 @@ export default function CampaignTab({
                   <strong>Discount:</strong> {c.discountPercentage}%
                 </p>
                 <p>
-                  <strong>Valid Until:</strong> {c.validUntil || "Not set"}
+                  <strong>Valid Until:</strong>{" "}
+                  {formatDate(c.validUntil, "DD.MM.YYYY") || "Not set"}
+                </p>
+                <p>
+                  <strong>Beneficiaries:</strong>{" "}
+                  {c.partnerships.map((p, index, arr) => (
+                    <span key={p.id}>
+                      {p.initiator.id.toString() ===
+                      localStorage.getItem("companyId")
+                        ? p.partner.name
+                        : p.initiator.name}
+                      {index < arr.length - 1 ? ", " : ""}
+                    </span>
+                  ))}
                 </p>
                 <div className="mt-2 space-x-2">
                   <button
                     className="btn btn-sm"
-                    onClick={() => updateCampaign(c.id)}
+                    onClick={() => handleEditClick(c)}
                   >
                     Edit
                   </button>
                   <button
                     className="btn btn-sm btn-error"
-                    onClick={() => disableCampaign(c.id)}
+                    onClick={() => handleDelete(c.id)}
                   >
-                    Disable
+                    Delete
                   </button>
                 </div>
               </li>
@@ -290,27 +436,26 @@ export default function CampaignTab({
           )}
         </ul>
 
-        {campaigns.length >= pageSize && (
-          <div className="flex justify-end mt-2 gap-2">
-            <button
-              className="btn btn-xs"
-              onClick={() =>
-                setPages((p) => ({ ...p, campaigns: p.campaigns - 1 }))
-              }
-              disabled={pages.campaigns === 0}
-            >
-              Prev
-            </button>
-            <button
-              className="btn btn-xs"
-              onClick={() =>
-                setPages((p) => ({ ...p, campaigns: p.campaigns + 1 }))
-              }
-            >
-              Next
-            </button>
-          </div>
-        )}
+        <div className="flex justify-end mt-2 gap-2 mb-20">
+          <button
+            className="btn"
+            onClick={() =>
+              setPages((p) => ({ ...p, campaigns: p.campaigns - 1 }))
+            }
+            disabled={pages.campaigns === 0}
+          >
+            Prev
+          </button>
+          <button
+            className="btn"
+            onClick={() =>
+              setPages((p) => ({ ...p, campaigns: p.campaigns + 1 }))
+            }
+            disabled={campaigns.length < pageSize}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

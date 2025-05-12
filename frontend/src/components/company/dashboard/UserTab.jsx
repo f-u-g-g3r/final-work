@@ -40,10 +40,10 @@ export default function UserTab({
                 <td>{user.id}</td>
                 <td>{user.name}</td>
                 <td>{user.uuid}</td>
-                <td>{user.active ? "Active" : "Inactive"}</td>
+                <td>{user.isActive ? "Active" : "Inactive"}</td>
                 <td>
                   <button className="btn btn-xs" disabled={user.role === "COMPANY_OWNER"} onClick={() => toggleUserStatus(user)}>
-                    {user.active ? "Disable" : "Enable"}
+                    {user.isActive ? "Disable" : "Enable"}
                   </button>
                 </td>
               </tr>

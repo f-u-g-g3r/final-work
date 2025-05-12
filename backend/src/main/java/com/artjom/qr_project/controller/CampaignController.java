@@ -35,14 +35,14 @@ public class CampaignController {
         return campaignService.createCampaign(dto);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody CampaignCreateDTO dto) {
         return campaignService.updateCampaign(id, dto);
     }
 
-    @PatchMapping("/{id}/disable")
-    public ResponseEntity<?> disable(@PathVariable Long id) {
-        return campaignService.disableCampaign(id);
+    @PatchMapping("/delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        return campaignService.deleteCampaign(id);
     }
 
     @GetMapping("/{id}")

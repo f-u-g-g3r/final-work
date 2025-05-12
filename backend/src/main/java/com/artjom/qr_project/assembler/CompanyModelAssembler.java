@@ -15,7 +15,7 @@ public class CompanyModelAssembler implements RepresentationModelAssembler<Compa
     @Override
     public EntityModel<CompanyDTO> toModel(CompanyDTO company) {
         return EntityModel.of(company,
-                linkTo(methodOn(CompanyController.class).one(company.getId())).withSelfRel(),
+                linkTo(methodOn(CompanyController.class).one(company.id())).withSelfRel(),
                 linkTo(methodOn(CompanyController.class).all()).withRel("companies"));
     }
 }

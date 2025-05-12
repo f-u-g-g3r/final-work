@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { getUsers, activateUser, deactivateUser } from "../../services/user-service";
 export default function UserManagement() {
@@ -45,7 +45,7 @@ export default function UserManagement() {
       }
       setUsers((prev) =>
         prev.map((user) =>
-          user.id === id ? { ...user, active: !user.active } : user
+          user.id === id ? { ...user, isActive: !user.isActive } : user
         )
       );
     } catch (e) {
@@ -112,17 +112,17 @@ export default function UserManagement() {
                 <td className="max-w-[200px] w-[200px] truncate whitespace-nowrap">{user.role}</td>
                 <td className="max-w-[200px] w-[200px] truncate whitespace-nowrap">{user.uuid}</td>
                 <td>
-                  <span className={user.active ? "text-success" : "text-error"}>
-                    {user.active ? "Active" : "Inactive"}
+                  <span className={user.isActive ? "text-success" : "text-error"}>
+                    {user.isActive ? "Active" : "Inactive"}
                   </span>
                 </td>
                 <td className="space-x-2">
                   <button
                     className="btn btn-xs btn-outline"
                     disabled={user.role === 'ADMIN'}
-                    onClick={() => handleToggleStatus(user.id, user.active)}
+                    onClick={() => handleToggleStatus(user.id, user.isActive)}
                   >
-                    {user.active ? "Deactivate" : "Activate"}
+                    {user.isActive ? "Deactivate" : "Activate"}
                   </button>
                 </td>
               </tr>

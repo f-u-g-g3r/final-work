@@ -7,7 +7,7 @@ export async function getInitiatedCampaigns(
   filters = {
     pagingOptions: {
       page: 0,
-      pageSize: 15,
+      pageSize: 5,
     },
     sortOptions: {
       sortBy: "id",
@@ -87,9 +87,9 @@ export async function createCampaign(campaign) {
   }
 }
 
-export async function updateCampaign(campaign) {
+export async function updateCampaign(id, campaign) {
   try {
-    const response = await axios.patch(`${API_URL}/updateCampaign`, campaign, {
+    const response = await axios.patch(`${API_URL}/${id}`, campaign, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -100,10 +100,10 @@ export async function updateCampaign(campaign) {
   }
 }
 
-export async function disableCampaign(id) {
+export async function deleteCampaign(id) {
   try {
     const response = await axios.patch(
-      `${API_URL}/disableCampaign/${id}`,
+      `${API_URL}/delete/${id}`,
       {},
       {
         headers: {

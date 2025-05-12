@@ -66,6 +66,7 @@ public class CampaignService {
         Campaign campaign = campaignRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Campaign not found"));
 
+        campaign.setTitle(dto.getTitle());
         campaign.setDescription(dto.getDescription());
         campaign.setDiscountPercentage(dto.getDiscountPercentage());
         campaign.setValidUntil(dto.getValidUntil());
@@ -75,14 +76,10 @@ public class CampaignService {
         return ResponseEntity.ok(campaignAssembler.toModel(CampaignMapper.toDTO(updated)));
     }
 
-    public ResponseEntity<?> disableCampaign(Long id) {
-        Campaign campaign = campaignRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Not found"));
+    public ResponseEntity<?> deleteCampaign(Long id) {
+        campaignRepo.deleteById(id);
 
-        campaign.setValidUntil(LocalDateTime.now()); // или campaign.setActive(false)
-        Campaign updated = campaignRepo.save(campaign);
-
-        return ResponseEntity.ok(campaignAssembler.toModel(CampaignMapper.toDTO(updated)));
+        return ResponseEntity.ok("Campaign deleted successfully");
     }
 
     public ResponseEntity<?> one(Long id) {

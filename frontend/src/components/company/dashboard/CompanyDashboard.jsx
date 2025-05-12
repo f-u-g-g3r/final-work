@@ -61,6 +61,7 @@ export default function CompanyDashboard() {
     });
 
     getInitiatedCampaigns(companyId).then((res) => {
+      console.log(res.content)
       setInitiatedCampaigns(res.content || []);
     });
 
@@ -70,6 +71,7 @@ export default function CompanyDashboard() {
   };
 
   useEffect(() => {
+    console.log("Fetching data...");
     refreshAll();
   }, [pages]);
 
@@ -85,14 +87,13 @@ export default function CompanyDashboard() {
 
   const handleAddUser = async () => {
     if (!newUserId) return;
-    console.log("fasfasfasfasfasfasf");
     await addUserToCompanyByUuid(localStorage.getItem("companyId"), newUserId);
     setNewUserId("");
     refreshAll();
   };
 
   const toggleUserStatus = async (user) => {
-    if (user.active) await deactivateUser(user.id);
+    if (user.isActive) await deactivateUser(user.id);
     else await activateUser(user.id);
     refreshAll();
   };
@@ -176,6 +177,7 @@ export default function CompanyDashboard() {
           formatDate={formatDate}
           generateQRCode={generateQRCode}
           activePartners={activePartners}
+          refreshAll={refreshAll}
         />
       )}
     </div>

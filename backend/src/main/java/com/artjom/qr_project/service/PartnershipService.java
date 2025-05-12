@@ -35,9 +35,9 @@ public class PartnershipService {
     private final PartnershipModelAssembler partnershipAssembler;
 
     public ResponseEntity<?> requestPartnership(PartnershipRequestDTO dto) {
-        Company initiator = companyRepo.findById(dto.getRequesterCompanyId())
+        Company initiator = companyRepo.findById(dto.requesterCompanyId())
                 .orElseThrow(() -> new RuntimeException("Initiator not found"));
-        Company partner = companyRepo.findById(dto.getTargetCompanyId())
+        Company partner = companyRepo.findById(dto.targetCompanyId())
                 .orElseThrow(() -> new RuntimeException("Target company not found"));
 
         if (partnershipRepo.existsByPartnerIdAndInitiatorIdAndStatus(partner.getId(), initiator.getId(), PartnershipStatus.PENDING)
@@ -62,14 +62,14 @@ public class PartnershipService {
     }
 
     public ResponseEntity<?> respondToRequest(PartnershipActionDTO dto) {
-        Partnership partnership = partnershipRepo.findById(dto.getPartnershipId())
+        Partnership partnership = partnershipRepo.findById(dto.partnershipId())
                 .orElseThrow(() -> new RuntimeException("Partnership not found"));
 
         if (partnership.getStatus() != PartnershipStatus.PENDING) {
             return ResponseEntity.badRequest().body("Request already processed.");
         }
 
-        partnership.setStatus(dto.isAccepted() ? PartnershipStatus.ACCEPTED : PartnershipStatus.REJECTED);
+        partnership.setStatus(dto.accepted() ? PartnershipStatus.ACCEPTED : PartnershipStatus.REJECTED);
         Partnership updated = partnershipRepo.save(partnership);
 
         return ResponseEntity.ok(partnershipAssembler.toModel(PartnershipMapper.toDTO(updated)));

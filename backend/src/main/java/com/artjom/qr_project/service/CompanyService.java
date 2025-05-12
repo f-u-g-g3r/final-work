@@ -65,7 +65,7 @@ public class CompanyService {
                 return ResponseEntity.badRequest().body("Manager email is not valid");
             }
 
-            Company newCompany = new Company(company.getName(), company.getCompanyEmail(), user.getEmail(), company.getRegistrationCode());
+            Company newCompany = new Company(company.name(), company.companyEmail(), user.getEmail(), company.registrationCode());
 
             newCompany.setCreatedAt(LocalDateTime.now());
             Company companyWithoutUser = companyRepository.save(newCompany);
@@ -151,14 +151,14 @@ public class CompanyService {
         Company company = companyRepository.findById(id)
                 .orElseThrow(() -> new CompanyNotFoundException(id));
 
-        if (companyDTO.getName() != null && !companyRepository.existsByName(companyDTO.getName())) {
-            company.setName(companyDTO.getName());
+        if (companyDTO.name() != null && !companyRepository.existsByName(companyDTO.name())) {
+            company.setName(companyDTO.name());
         }
-        if (companyDTO.getCompanyEmail() != null && !companyRepository.existsByCompanyEmail(companyDTO.getCompanyEmail())) {
-            company.setCompanyEmail(companyDTO.getCompanyEmail());
+        if (companyDTO.companyEmail() != null && !companyRepository.existsByCompanyEmail(companyDTO.companyEmail())) {
+            company.setCompanyEmail(companyDTO.companyEmail());
         }
-        if (companyDTO.getRegistrationCode() != null && !companyRepository.existsByRegistrationCode(companyDTO.getRegistrationCode())) {
-            company.setRegistrationCode(companyDTO.getRegistrationCode());
+        if (companyDTO.registrationCode() != null && !companyRepository.existsByRegistrationCode(companyDTO.registrationCode())) {
+            company.setRegistrationCode(companyDTO.registrationCode());
         }
 
         Company updatedCompany = companyRepository.save(company);
@@ -187,11 +187,11 @@ public class CompanyService {
     }
 
     public ResponseEntity<?> addUserToCompanyByUuid(AddUserToCompanyRequestDTO userToCompanyRequestDTO) {
-        Company company = companyRepository.findById(userToCompanyRequestDTO.getCompanyId())
-                .orElseThrow(() -> new CompanyNotFoundException(userToCompanyRequestDTO.getCompanyId()));
+        Company company = companyRepository.findById(userToCompanyRequestDTO.companyId())
+                .orElseThrow(() -> new CompanyNotFoundException(userToCompanyRequestDTO.companyId()));
 
-        User user = userRepository.findByUuid(userToCompanyRequestDTO.getUserUniqId())
-                .orElseThrow(() -> new UserNotFoundException(userToCompanyRequestDTO.getUserUniqId()));
+        User user = userRepository.findByUuid(userToCompanyRequestDTO.userUniqId())
+                .orElseThrow(() -> new UserNotFoundException(userToCompanyRequestDTO.userUniqId()));
 
         if (user.getCompany() != null) {
             return ResponseEntity.badRequest().body("User already belongs to a company");

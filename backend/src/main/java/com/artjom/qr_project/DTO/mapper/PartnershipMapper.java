@@ -7,22 +7,26 @@ import java.util.stream.Collectors;
 
 public class PartnershipMapper {
     public static PartnershipDTO toFlatDTO(Partnership partnership) {
-        PartnershipDTO dto = new PartnershipDTO();
-        dto.setId(partnership.getId());
-        dto.setCreatedAt(partnership.getCreatedAt());
-        dto.setInitiator(CompanyMapper.toDTO(partnership.getInitiator()));
-        dto.setPartner(CompanyMapper.toDTO(partnership.getPartner()));
-        dto.setStatus(partnership.getStatus());
-        return dto;
+        return new PartnershipDTO(
+                partnership.getId(),
+                partnership.getCreatedAt(),
+                CompanyMapper.toDTO(partnership.getInitiator()),
+                CompanyMapper.toDTO(partnership.getPartner()),
+                null,
+                partnership.getStatus()
+        );
     }
 
     public static PartnershipDTO toDTO(Partnership partnership) {
-        PartnershipDTO dto = toFlatDTO(partnership);
-        dto.setCampaigns(
+        return new PartnershipDTO(
+                partnership.getId(),
+                partnership.getCreatedAt(),
+                CompanyMapper.toDTO(partnership.getInitiator()),
+                CompanyMapper.toDTO(partnership.getPartner()),
                 partnership.getCampaigns().stream()
                         .map(CampaignMapper::toFlatDTO)
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList()),
+                partnership.getStatus()
         );
-        return dto;
     }
 }

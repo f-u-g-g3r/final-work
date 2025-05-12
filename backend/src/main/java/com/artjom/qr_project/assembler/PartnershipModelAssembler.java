@@ -15,7 +15,7 @@ public class PartnershipModelAssembler implements RepresentationModelAssembler<P
     @Override
     public EntityModel<PartnershipDTO> toModel(PartnershipDTO partnership) {
         return EntityModel.of(partnership,
-                linkTo(methodOn(PartnershipController.class).one(partnership.getId())).withSelfRel(),
+                linkTo(methodOn(PartnershipController.class).one(partnership.id())).withSelfRel(),
                 linkTo(methodOn(PartnershipController.class).all()).withRel("partnerships"));
     }
 }

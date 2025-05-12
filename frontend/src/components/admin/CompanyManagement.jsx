@@ -47,7 +47,7 @@ export default function CompanyManagement() {
       }
       setCompanies((prev) =>
         prev.map((company) =>
-          company.id === id ? { ...company, enabled: !company.enabled } : company
+          company.id === id ? { ...company, isEnabled: !company.isEnabled } : company
         )
       );
     } catch (e) {
@@ -103,8 +103,8 @@ export default function CompanyManagement() {
                 <td className="w-[350px] truncate whitespace-nowrap">{company.managerEmail}</td>
                 <td className="w-[300px] truncate whitespace-nowrap">{company.registrationCode}</td>
                 <td>
-                  <span className={company.enabled ? "text-success" : "text-error"}>
-                    {company.enabled ? "Active" : "Inactive"}
+                  <span className={company.isEnabled ? "text-success" : "text-error"}>
+                    {company.isEnabled ? "Active" : "Inactive"}
                   </span>
                 </td>
                 <td className="space-x-2">
@@ -112,10 +112,10 @@ export default function CompanyManagement() {
                     className="btn btn-xs btn-outline"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleToggleStatus(company.id, company.enabled);
+                      handleToggleStatus(company.id, company.isEnabled);
                     }}
                   >
-                    {company.enabled ? "Deactivate" : "Activate"}
+                    {company.isEnabled ? "Deactivate" : "Activate"}
                   </button>
                 </td>
               </tr>

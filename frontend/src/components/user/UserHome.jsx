@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getBeneficiaryOfCompany } from "../../services/campaign-service";
 import QRCode from "react-qr-code";
 import { generateQr } from "../../services/qr-service";
@@ -17,7 +17,6 @@ export default function UserHome() {
   const handleGenerateQR = async (campaignId) => {
     try {
       const res = await generateQr(campaignId);
-      console.log(res);
       setQrUrls((prev) => ({ ...prev, [campaignId]: res.qrUrl }));
     } catch (error) {
       console.error("Failed to generate QR:", error);

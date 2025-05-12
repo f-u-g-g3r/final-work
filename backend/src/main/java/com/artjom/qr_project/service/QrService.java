@@ -28,11 +28,11 @@ public class QrService {
 
     public ResponseEntity<Map<String, String>> generateQr(QrRequest qrRequest) {
         try {
-            if (qrRequest.getCampaignId() == null || qrRequest.getTtlSeconds() == null) {
+            if (qrRequest.campaignId() == null || qrRequest.ttlSeconds() == null) {
                 return ResponseEntity.badRequest().build();
             }
 
-            Campaign campaign = campaignService.findById(qrRequest.getCampaignId())
+            Campaign campaign = campaignService.findById(qrRequest.campaignId())
                     .orElseThrow(() -> new RuntimeException("Campaign not found"));
 
             Map<String, Object> qrData = new HashMap<>();
@@ -47,7 +47,7 @@ public class QrService {
             ObjectMapper mapper = new ObjectMapper();
             String qrDataJson = mapper.writeValueAsString(qrData);
 
-            redisTemplate.opsForValue().set("qr:" + uuid, qrDataJson, qrRequest.getTtlSeconds(), TimeUnit.SECONDS);
+            redisTemplate.opsForValue().set("qr:" + uuid, qrDataJson, qrRequest.ttlSeconds(), TimeUnit.SECONDS);
 
             Map<String, String> response = new HashMap<>();
             response.put("qrUrl", frontendUrl + "/qr/scan/" + uuid);

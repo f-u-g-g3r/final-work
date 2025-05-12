@@ -26,15 +26,15 @@ export default () => {
     return <CreateCompanyPrompt user={user} />;
   }
 
-  if (!user.active && user.role === 'DISABLED_USER') {
+  if (!user.isActive && user.role === 'DISABLED_USER') {
     return <InactiveAccountNotice />;
-  } else if (!user.active && user.role === 'COMPANY_OWNER') {
+  } else if (!user.isActive && user.role === 'COMPANY_OWNER') {
     return <InactiveCompanyNotice />;
   } else if (user.role === 'ADMIN') {
     return redirect('/admin-panel')
-  } else if (user.active && user.role === 'COMPANY_OWNER') {
+  } else if (user.isActive && user.role === 'COMPANY_OWNER') {
     return <CompanyDashboard />;
-  } else if (user.active && user.role === 'EMPLOYEE') {
+  } else if (user.isActive && user.role === 'EMPLOYEE') {
     return <UserHome />
   } else {
     console.log(user)

@@ -15,7 +15,7 @@ public class CampaignModelAssembler implements RepresentationModelAssembler<Camp
     @Override
     public EntityModel<CampaignDTO> toModel(CampaignDTO campaign) {
         return EntityModel.of(campaign,
-                linkTo(methodOn(CampaignController.class).one(campaign.getId())).withSelfRel(),
+                linkTo(methodOn(CampaignController.class).one(campaign.id())).withSelfRel(),
                 linkTo(methodOn(CampaignController.class).all()).withRel("campaigns"));
     }
 }
