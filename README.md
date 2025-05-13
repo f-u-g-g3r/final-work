@@ -47,3 +47,15 @@ This command will start the following services:
 The app will be available at:
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8080
+
+## Test User Credentials
+
+To test the application, you can use the following predefined accounts, each representing a different user role:
+
+| Role              | Email                         | Password     |
+|-------------------|-------------------------------|--------------|
+| Administrator     | admin@mail.com                | admin        |
+| Company Owner     | manager1@mail.com             | password     |
+| Employee          | company1.employee1@mail.com   | password     |
+
+
